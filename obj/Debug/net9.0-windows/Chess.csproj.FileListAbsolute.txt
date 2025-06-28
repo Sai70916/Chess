@@ -7,6 +7,7 @@ C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\Chess\ob
 C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\Chess\obj\Debug\net9.0-windows\Chess.AssemblyInfoInputs.cache
 C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\Chess\obj\Debug\net9.0-windows\Chess.AssemblyInfo.cs
 C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\Chess\obj\Debug\net9.0-windows\Chess.csproj.CoreCompileInputs.cache
+C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\Chess\obj\Debug\net9.0-windows\Chess.sourcelink.json
 C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\Chess\obj\Debug\net9.0-windows\Chess.dll
 C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\Chess\obj\Debug\net9.0-windows\refint\Chess.dll
 C:\Users\mail2\OneDrive\Documents\My Stuff\Coding Projects\Chess Engine\Chess\obj\Debug\net9.0-windows\Chess.pdb
