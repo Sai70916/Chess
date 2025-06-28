@@ -14,7 +14,8 @@ namespace Chess
         private int? selectedRow;
         private int? selectedCol;
 
-        private Label boardPositionInfoLabel;
+        public Label boardPositionInfoLabel;
+        public static Label boardLabel = new Label();
 
         public Form1()
         {
@@ -32,6 +33,8 @@ namespace Chess
             windowWidth = this.ClientSize.Width;
             windowHeight = this.ClientSize.Height;
 
+            // Debug
+            // Delete
             // Label to show the row and col the user clicked on
             boardPositionInfoLabel = new Label();
             boardPositionInfoLabel.Text = $"Row: Col: ";
@@ -41,6 +44,18 @@ namespace Chess
             boardPositionInfoLabel.AutoSize = true;
             boardPositionInfoLabel.Location = new Point(20, 20);
             this.Controls.Add(boardPositionInfoLabel);
+
+            // Debug
+            // Delete
+            // Label to show the array showing the board
+            boardLabel = new Label();
+            boardLabel.Text = $"test for display";
+            boardLabel.ForeColor = Color.White;
+            boardLabel.BackColor = Color.Transparent;
+            boardLabel.Font = new Font("Arial", 16, FontStyle.Bold);
+            boardLabel.AutoSize = true;
+            boardLabel.Location = new Point(20, 50);
+            this.Controls.Add(boardLabel);
         }
 
 
