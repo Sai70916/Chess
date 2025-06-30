@@ -1,3 +1,5 @@
+using System.CodeDom;
+
 namespace Chess
 {
     public partial class Form1 : Form
@@ -17,9 +19,12 @@ namespace Chess
         public Label boardPositionInfoLabel;
         public static Label boardLabel = new Label();
 
+        private Dictionary<string, Image> pieceImages = new();
+
         public Form1()
         {
             InitializeComponent();
+            LoadPieceImages();
 
             this.BackColor = Color.FromArgb(50, 50, 50);
             this.WindowState = FormWindowState.Maximized; // Make sure the window is maximized
@@ -82,20 +87,21 @@ namespace Chess
             {
                 for (int col = 0; col < BoardRows; col++)
                 {
-                    Color tileColor;
-
-                    if (selectedRow == row && selectedCol == col)
-                    {
-                        tileColor = Color.LightBlue;
-                    }
-                    else
-                    {
-                        tileColor = ((row + col) % 2 == 0) ? Color.White : Color.Gray; // Choose the color of the squares - add row and col, divide by 2, if remainder is 0, white, else grey
-                    }
+                    Color tileColor = (selectedRow == row && selectedCol == col) ? Color.LightBlue :
+                                      ((row + col) % 2 == 0) ? Color.White : Color.Gray;
 
                     using (SolidBrush brush = new SolidBrush(tileColor))
                     {
                         g.FillRectangle(brush, startX + (col * tileSize), startY + (row * tileSize), tileSize, tileSize);
+                    }
+
+                    // --DRAW PIECE--
+                    int squareIndex = row * 8 + col;
+                    int piece = Board.Square[squareIndex];
+
+                    if (piece != Piece.None)
+                    {
+                        string pieceSymbol = "9";
                     }
                 }
             }
@@ -116,6 +122,7 @@ namespace Chess
                     selectedRow = row;
                     selectedCol = col;
                     boardPositionInfoLabel.Text = $"Selected Board Position, Row: {selectedRow} Col: {selectedCol}";
+                    this.Invalidate(); // Repaint the form to make sure the square is blue
                 }
             }
         }
@@ -133,6 +140,22 @@ namespace Chess
             return null;
         }
 
+        private void LoadPieceImages()
+        {
+            pieceImages["P"] = Image.FromFile("Resources/Piece/wp.png");
+            pieceImages["R"] = Image.FromFile("Resources/Piece/wr.png");
+            pieceImages["N"] = Image.FromFile("Resources/Piece/wn.png");
+            pieceImages["B"] = Image.FromFile("Resources/Piece/wb.png");
+            pieceImages["Q"] = Image.FromFile("Resources/Piece/wq.png");
+            pieceImages["K"] = Image.FromFile("Resources/Piece/wk.png");
+
+            pieceImages["p"] = Image.FromFile("Resources/Piece/bp.png");
+            pieceImages["r"] = Image.FromFile("Resources/Piece/br.png");
+            pieceImages["n"] = Image.FromFile("Resources/Piece/bn.png");
+            pieceImages["b"] = Image.FromFile("Resources/Piece/bb.png");
+            pieceImages["q"] = Image.FromFile("Resources/Piece/bq.png");
+            pieceImages["k"] = Image.FromFile("Resources/Piece/bk.png");
+        }
     }
 }
 
