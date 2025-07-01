@@ -1,5 +1,3 @@
-using System.CodeDom;
-
 namespace Chess
 {
     public partial class Form1 : Form
@@ -16,14 +14,14 @@ namespace Chess
         private int? selectedRow;
         private int? selectedCol;
 
-        public Label boardPositionInfoLabel;
-        public static Label boardLabel = new Label();
-
         private Dictionary<string, Image> pieceImages = new();
 
         public Form1()
         {
             InitializeComponent();
+            Board.LoadStartPosition();
+            // Fix image displaying
+            // Uncomment when ready
             LoadPieceImages();
 
             this.BackColor = Color.FromArgb(50, 50, 50);
@@ -37,30 +35,6 @@ namespace Chess
 
             windowWidth = this.ClientSize.Width;
             windowHeight = this.ClientSize.Height;
-
-            // Debug
-            // Delete
-            // Label to show the row and col the user clicked on
-            boardPositionInfoLabel = new Label();
-            boardPositionInfoLabel.Text = $"Row: Col: ";
-            boardPositionInfoLabel.ForeColor = Color.White;
-            boardPositionInfoLabel.BackColor = Color.Transparent;
-            boardPositionInfoLabel.Font = new Font("Arial", 16, FontStyle.Bold);
-            boardPositionInfoLabel.AutoSize = true;
-            boardPositionInfoLabel.Location = new Point(20, 20);
-            this.Controls.Add(boardPositionInfoLabel);
-
-            // Debug
-            // Delete
-            // Label to show the array showing the board
-            boardLabel = new Label();
-            boardLabel.Text = $"test for display";
-            boardLabel.ForeColor = Color.White;
-            boardLabel.BackColor = Color.Transparent;
-            boardLabel.Font = new Font("Arial", 16, FontStyle.Bold);
-            boardLabel.AutoSize = true;
-            boardLabel.Location = new Point(20, 50);
-            this.Controls.Add(boardLabel);
         }
 
 
@@ -101,7 +75,12 @@ namespace Chess
 
                     if (piece != Piece.None)
                     {
-                        string pieceSymbol = "9";
+                        string pieceSymbol = Piece.GetPieceSymbol(piece);
+
+                        if (pieceImages.TryGetValue(pieceSymbol, out Image? img) && img != null)
+                        {
+                            g.DrawImage(img, new RectangleF(startX + (col * tileSize), startY + (row * tileSize), tileSize, tileSize));
+                        }
                     }
                 }
             }
@@ -117,12 +96,35 @@ namespace Chess
                 var pos = GetBoardPosition(x, y);
                 if (pos != null)
                 {
-                    var (row, col) = pos.Value;
+                    var (newRow, newCol) = pos.Value;
 
-                    selectedRow = row;
-                    selectedCol = col;
-                    boardPositionInfoLabel.Text = $"Selected Board Position, Row: {selectedRow} Col: {selectedCol}";
-                    this.Invalidate(); // Repaint the form to make sure the square is blue
+                    // Keep track of last highlighted square to make sure it turn normal 
+                    // after new square is selected
+                    if (selectedRow.HasValue && selectedCol.HasValue)
+                    {
+                        Rectangle oldTileRect = new Rectangle(
+                            startX + (selectedCol.Value * tileSize),
+                            startY + (selectedRow.Value * tileSize),
+                            tileSize,
+                            tileSize
+                        ); // Since selectedCol and Row are set to int? to make them nullable, 
+                           // we have to get the value of it to not get a error : can not convert 
+                           // int? to int
+                        this.Invalidate(oldTileRect);
+                    }
+
+                    selectedCol = newCol;
+                    selectedRow = newRow;
+
+                    // Update the selection
+                    Rectangle newTileRect = new Rectangle(
+                        startX + (selectedCol.Value * tileSize),
+                        startY + (selectedRow.Value * tileSize),
+                        tileSize,
+                        tileSize
+                    );
+
+                    this.Invalidate(newTileRect); // Repaint the form to make sure the square is blue
                 }
             }
         }
@@ -140,21 +142,23 @@ namespace Chess
             return null;
         }
 
+        // Fix image displaying
+        // Uncomment when ready
         private void LoadPieceImages()
         {
-            pieceImages["P"] = Image.FromFile("Resources/Piece/wp.png");
-            pieceImages["R"] = Image.FromFile("Resources/Piece/wr.png");
-            pieceImages["N"] = Image.FromFile("Resources/Piece/wn.png");
-            pieceImages["B"] = Image.FromFile("Resources/Piece/wb.png");
-            pieceImages["Q"] = Image.FromFile("Resources/Piece/wq.png");
-            pieceImages["K"] = Image.FromFile("Resources/Piece/wk.png");
+            pieceImages["P"] = Image.FromFile($"Resources/Pieces/white_pawn.png");
+            pieceImages["R"] = Image.FromFile("Resources/Pieces/white_rook.png");
+            pieceImages["N"] = Image.FromFile("Resources/Pieces/white_knight.png");
+            pieceImages["B"] = Image.FromFile("Resources/Pieces/white_bishop.png");
+            pieceImages["Q"] = Image.FromFile("Resources/Pieces/white_queen.png");
+            pieceImages["K"] = Image.FromFile("Resources/Pieces/white_king.png");
 
-            pieceImages["p"] = Image.FromFile("Resources/Piece/bp.png");
-            pieceImages["r"] = Image.FromFile("Resources/Piece/br.png");
-            pieceImages["n"] = Image.FromFile("Resources/Piece/bn.png");
-            pieceImages["b"] = Image.FromFile("Resources/Piece/bb.png");
-            pieceImages["q"] = Image.FromFile("Resources/Piece/bq.png");
-            pieceImages["k"] = Image.FromFile("Resources/Piece/bk.png");
+            pieceImages["p"] = Image.FromFile("Resources/Pieces/black_pawn.png");
+            pieceImages["r"] = Image.FromFile("Resources/Pieces/black_rook.png");
+            pieceImages["n"] = Image.FromFile("Resources/Pieces/black_knight.png");
+            pieceImages["b"] = Image.FromFile("Resources/Pieces/black_bishop.png");
+            pieceImages["q"] = Image.FromFile("Resources/Pieces/black_queen.png");
+            pieceImages["k"] = Image.FromFile("Resources/Pieces/black_king.png");
         }
     }
 }

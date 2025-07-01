@@ -23,7 +23,7 @@ namespace Chess
 
                 if (piece != Piece.None)
                 {
-                    var pieceType = Piece.PieceType(piece);
+                    var pieceType = Piece.GetPieceType(piece);
                     var pieceColor = (Piece.IsColor(piece, Piece.White)) ? Piece.White : Piece.Black;
                 }
             }
@@ -31,7 +31,7 @@ namespace Chess
 
         static void Initialize()
         {
-            Square = new int[64];
+            Array.Fill(Square, Piece.None);
         }
     }
 }

@@ -60,9 +60,10 @@ namespace Chess
 
         public static Coord CoordFromIndex(int squareIndex)
         {
-            return new Coord(FileIndex(squareIndex), FileIndex(squareIndex));
+            return new Coord(FileIndex(squareIndex), RankIndex(squareIndex));
         }
 
+        // Check if the square in the chess board is white
         public static bool IsWhite(int fileIndex, int rankIndex)
         {
             return (fileIndex + rankIndex) % 2 == 0;

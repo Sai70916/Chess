@@ -16,8 +16,6 @@ namespace Chess
         public const int White = 8; // 0b00001000
         public const int Black = 16; // 0b00100000
 
-        public static Dictionary<int, string> pieceToSymbol = new();
-
         // no public or private since we donts need them outside of here
         const int typeMask = 0b00111;
         const int blackMask = 0b10000;
@@ -35,19 +33,31 @@ namespace Chess
             return (piece & colorMask) == color;
         }
 
-        public static int Color(int piece)
+        public static int GetColor(int piece)
         {
             return piece & colorMask;
         }
 
-        public static int PieceType(int piece)
+        public static int GetPieceType(int piece)
         {
             return piece & typeMask;
         }
 
-        public static string PieceSymbol(int piece)
+        public static string GetPieceSymbol(int piece)
         {
-            return "hello world";
+            int type = GetPieceType(piece);
+            bool isWhite = IsColor(piece, White);
+
+            return type switch
+            {
+                Pawn => isWhite ? "P" : "p",
+                Rook => isWhite ? "R" : "r",
+                Knight => isWhite ? "N" : "n",
+                Bishop => isWhite ? "B" : "b",
+                Queen => isWhite ? "Q" : "q",
+                King => isWhite ? "K" : "k",
+                _ => ""
+            };
         }
     }
 }

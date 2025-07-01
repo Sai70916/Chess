@@ -61,7 +61,7 @@ namespace Chess
             loadedPositionInfo.blackCastleKingside = castlingRights.Contains("k");
             loadedPositionInfo.blackCastleQueenside = castlingRights.Contains("q");
 
-            if (sections.Length > 3)
+            if (sections.Length > 3 && sections[3] != "--")
             {
                 char enPassantFileName = sections[3][0]; // We dont need rank
                 if (BoardRepresentation.fileNames.Contains(enPassantFileName))
