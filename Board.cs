@@ -15,8 +15,9 @@ namespace Chess
             Initialize();
             var loadedPositon = FenUtility.PositionFromFen(fen);
 
-            // Load the pieces in a array and draw the pieces to the board??
-            for (int squareIndex = 0; squareIndex < 64; squareIndex++)
+            // Load the pieces in a array
+            // Use 63 and check if equal to zero since it is 0-indexed
+            for (int squareIndex = 63; squareIndex >= 0; squareIndex--)
             {
                 var piece = loadedPositon.squares[squareIndex];
                 Square[squareIndex] = piece;
@@ -32,6 +33,11 @@ namespace Chess
         static void Initialize()
         {
             Array.Fill(Square, Piece.None);
+        }
+
+        public static bool SquareContainsPiece(int row, int col)
+        {
+            return Square[row * 8 + col] != Piece.None;
         }
     }
 }

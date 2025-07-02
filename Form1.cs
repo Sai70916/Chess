@@ -13,12 +13,14 @@ namespace Chess
 
         private int? selectedRow;
         private int? selectedCol;
+        private int[]? selectedPieceCoords = new int[2];
 
         private Dictionary<string, Image> pieceImages = new();
 
         public Form1()
         {
             InitializeComponent();
+            this.DoubleBuffered = true; // Makes the flickering when redrawing the board go away
             Board.LoadStartPosition();
             // Fix image displaying
             // Uncomment when ready
@@ -62,13 +64,21 @@ namespace Chess
                 for (int col = 0; col < BoardRows; col++)
                 {
                     Color tileColor = (selectedRow == row && selectedCol == col) ? Color.LightBlue :
-                                      ((row + col) % 2 == 0) ? Color.White : Color.Gray;
+                                      ((row + col) % 2 == 0) ? Color.White : Color.FromArgb(169, 122, 101);
 
                     using (SolidBrush brush = new SolidBrush(tileColor))
                     {
                         g.FillRectangle(brush, startX + (col * tileSize), startY + (row * tileSize), tileSize, tileSize);
                     }
 
+                    // Add semi transparent display over selected squares
+                    if (selectedRow == row && selectedCol == col)
+                    {
+                        using (SolidBrush overlay = new SolidBrush(Color.FromArgb(25, Color.Cyan)))
+                        {
+                            g.FillRectangle(overlay, startX + (col * tileSize), startY + (row * tileSize), tileSize, tileSize);
+                        }
+                    }
                     // --DRAW PIECE--
                     int squareIndex = row * 8 + col;
                     int piece = Board.Square[squareIndex];
@@ -82,6 +92,7 @@ namespace Chess
                             g.DrawImage(img, new RectangleF(startX + (col * tileSize), startY + (row * tileSize), tileSize, tileSize));
                         }
                     }
+
                 }
             }
         }
@@ -102,29 +113,21 @@ namespace Chess
                     // after new square is selected
                     if (selectedRow.HasValue && selectedCol.HasValue)
                     {
-                        Rectangle oldTileRect = new Rectangle(
-                            startX + (selectedCol.Value * tileSize),
-                            startY + (selectedRow.Value * tileSize),
-                            tileSize,
-                            tileSize
-                        ); // Since selectedCol and Row are set to int? to make them nullable, 
-                           // we have to get the value of it to not get a error : can not convert 
-                           // int? to int
-                        this.Invalidate(oldTileRect);
+                        this.Invalidate();
                     }
 
-                    selectedCol = newCol;
-                    selectedRow = newRow;
+                    if (Board.SquareContainsPiece(newRow, newCol))
+                    {
+                        selectedRow = newRow;
+                        selectedCol = newCol;
 
-                    // Update the selection
-                    Rectangle newTileRect = new Rectangle(
-                        startX + (selectedCol.Value * tileSize),
-                        startY + (selectedRow.Value * tileSize),
-                        tileSize,
-                        tileSize
-                    );
-
-                    this.Invalidate(newTileRect); // Repaint the form to make sure the square is blue
+                        this.Invalidate(); // Repaint the form to make sure the square is blue
+                    }
+                    else
+                    {
+                        selectedCol = null;
+                        selectedRow = null;
+                    }
                 }
             }
         }

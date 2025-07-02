@@ -22,35 +22,35 @@ namespace Chess
             LoadedPositionInfo loadedPositionInfo = new LoadedPositionInfo();
             string[] sections = fen.Split(" "); // Seperate the fen into a list
 
-            int file = 0;
-            int rank = 7;
+            int col = 0;
+            int row = 0;
 
             foreach (char symbol in sections[0])
             {
                 if (symbol == '/')
                 {
-                    file = 0;
-                    rank--;
+                    col = 0;
+                    row++;
                 }
                 else
                 {
                     if (char.IsDigit(symbol))
                     {
-                        file += (int)char.GetNumericValue(symbol);
+                        col += (int)char.GetNumericValue(symbol);
                     }
                     else
                     {
-                        int pieceColor = (char.IsUpper(symbol)) ? Piece.White : Piece.Black;
+                        int pieceColor = char.IsUpper(symbol) ? Piece.White : Piece.Black;
                         int pieceType = pieceTypeFromSymbol[char.ToLower(symbol)];
-                        // We go fron top to bottom, so rank when zero indexed is 7, evertime we reach down, 
-                        // remove 1 rank, so rank * 8 gives us the row from top
-                        loadedPositionInfo.squares[rank * 8 + file] = pieceColor | pieceType;
-                        file++;
+                        // We go from top to bottom, so row 0, evertime we reach down, 
+                        // add 1 row, so row * 8 gives us the row from top
+                        loadedPositionInfo.squares[row * 8 + col] = pieceColor | pieceType;
+                        col++;
                     }
                 }
             }
 
-            loadedPositionInfo.whiteToMove = (sections[1] == "w");
+            loadedPositionInfo.whiteToMove = sections[1] == "w";
 
             // Get the string of letter(s) that show the castling right directly from the
             // fen string, but only if provided, i.e. the fen has more than just 
@@ -63,7 +63,7 @@ namespace Chess
 
             if (sections.Length > 3 && sections[3] != "--")
             {
-                char enPassantFileName = sections[3][0]; // We dont need rank
+                char enPassantFileName = sections[3][0]; // We dont need row
                 if (BoardRepresentation.fileNames.Contains(enPassantFileName))
                 {
                     loadedPositionInfo.epFile = BoardRepresentation.fileNames.IndexOf(enPassantFileName);
