@@ -91,7 +91,7 @@ namespace Chess
                     }
                     // --DRAW PIECE--
                     int squareIndex = row * 8 + col;
-                    int piece = BitBoardUtility.GetPieceAtSquare(squareIndex).pieceType;
+                    int piece = BitBoardUtility.GetPieceAtSquare(squareIndex).piecePresent;
 
                     if (piece != Piece.None)
                     {
@@ -102,7 +102,6 @@ namespace Chess
                             g.DrawImage(img, new RectangleF(startX + (col * tileSize), startY + (row * tileSize), tileSize, tileSize));
                         }
                     }
-
                 }
             }
         }
@@ -121,39 +120,47 @@ namespace Chess
                 if (!isPieceSelected)
                 {
                     // Select a piece if the square has a piece on it and highlight it
-                    if (BitBoardUtility.GetPieceAtSquare(clickedRow * 8 + clickedCol) is (true, int piecePresent, bool))
+                    var (isPiecePresent, piecePresent, isWhite) = BitBoardUtility.GetPieceAtSquare(clickedRow * 8 + clickedCol);
+                    if (isPiecePresent)
                     {
                         selectedRow = clickedRow;
                         selectedCol = clickedCol;
-                        isPieceSelected = piecePresent != Piece.None;
+                        isPieceSelected = true;
 
                         this.Invalidate(); // Repaint the form to make sure the square is blue
                     }
                 }
-
-                // If the highlighted square is the same place as the new click, 
-                // unhighlight the square
-                if (selectedRow != null && selectedCol != null)
+                else if (isPieceSelected)
                 {
-                    if (selectedRow.Value == clickedRow && selectedCol.Value == clickedCol)
+                    // If the already selected square is clicked on again, remove selection
+                    if (selectedRow == clickedRow && selectedCol == clickedCol)
                     {
-                        selectedRow = null;
-                        selectedCol = null;
+                        selectedRow = selectedCol = null;
+                        isPieceSelected = false;
                         this.Invalidate();
-                        return;
+                    }
+                    // If another square is click and another piece is present, unselect
+                    else if (BitBoardUtility.GetPieceAtSquare(clickedRow * 8 + clickedCol).isPiecePresent)
+                    {
+                        selectedRow = clickedRow;
+                        selectedCol = clickedCol;
+                        isPieceSelected = true;
+                        this.Invalidate();
+                    }
+                    // If the clicked on square is empty, unselect the selected square
+                    else if (!BitBoardUtility.GetPieceAtSquare(clickedRow * 8 + clickedCol).isPiecePresent)
+                    {
+                        selectedRow = selectedCol = null;
+                        isPieceSelected = false;
+                        this.Invalidate();
                     }
                 }
-                else
-                {
-                    selectedRow = null;
-                    selectedCol = null;
-                    this.Invalidate();
-                }
             }
-            else if (pos == null && selectedRow.HasValue && selectedCol.HasValue)
+            // If the click is outside the board
+            else if (pos == null && isPieceSelected)
             {
-                selectedRow = null;
-                selectedCol = null;
+                selectedRow = selectedCol = null;
+                isPieceSelected = false;
                 this.Invalidate();
             }
         }
@@ -191,4 +198,3 @@ namespace Chess
         }
     }
 }
-
