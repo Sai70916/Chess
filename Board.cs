@@ -3,7 +3,13 @@ namespace Chess
     using System.Collections.Generic;
     public static class Board
     {
+        // Array of the board, used for easy lookup and easier to use when rendering the board
+        public static int[] Squares = new int[64];
+
         // --BIT BOARDS--
+        // Representation of the board in binary, a bit is flipped on if piece is present 
+        // with each bit representing a square
+        // Use them for move gen, legal moves gen and for bitwise operations
         // White bitboards
         public static ulong WhitePawns;
         public static ulong WhiteRooks;
@@ -43,7 +49,10 @@ namespace Chess
                 // Check if the square is empty since any empty spaces should be 0 so do not change anything then
                 if (piece == Piece.None) continue;
 
-                // this make a u long with just a single 1. Where the one is is based on 
+                // Update the Squares array along with the bitboards
+                Squares[squareIndex] = piece;
+
+                // This makes a u long with just a single 1. Where the one is is based on 
                 // the number next to the left shift operator <<. If its 3, the ulong 
                 // will be a set of 63 zeroes but with a 1 three places to the left of 
                 // the end of the ulong, so 000...1000. This with the && operator 
@@ -82,6 +91,8 @@ namespace Chess
 
         static void Initialize()
         {
+            // Clear the board representation
+            Array.Fill(Squares, Piece.None);
             WhitePawns = WhiteRooks = WhiteKnights = WhiteBishops = WhiteQueens = WhiteKing = 0;
             BlackPawns = BlackRooks = BlackKnights = BlackBishops = BlackQueens = BlackKing = 0;
         }

@@ -91,7 +91,7 @@ namespace Chess
                     }
                     // --DRAW PIECE--
                     int squareIndex = row * 8 + col;
-                    int piece = BitBoardUtility.GetPieceAtSquare(squareIndex).piecePresent;
+                    int piece = Board.Squares[squareIndex];
 
                     if (piece != Piece.None)
                     {
@@ -120,8 +120,7 @@ namespace Chess
                 if (!isPieceSelected)
                 {
                     // Select a piece if the square has a piece on it and highlight it
-                    var (isPiecePresent, piecePresent, isWhite) = BitBoardUtility.GetPieceAtSquare(clickedRow * 8 + clickedCol);
-                    if (isPiecePresent)
+                    if (Board.Squares[clickedRow * 8 + clickedCol] != Piece.None)
                     {
                         selectedRow = clickedRow;
                         selectedCol = clickedCol;
@@ -140,7 +139,7 @@ namespace Chess
                         this.Invalidate();
                     }
                     // If another square is click and another piece is present, unselect
-                    else if (BitBoardUtility.GetPieceAtSquare(clickedRow * 8 + clickedCol).isPiecePresent)
+                    else if (Board.Squares[clickedRow * 8 + clickedCol] != Piece.None)
                     {
                         selectedRow = clickedRow;
                         selectedCol = clickedCol;
@@ -148,7 +147,7 @@ namespace Chess
                         this.Invalidate();
                     }
                     // If the clicked on square is empty, unselect the selected square
-                    else if (!BitBoardUtility.GetPieceAtSquare(clickedRow * 8 + clickedCol).isPiecePresent)
+                    else if (Board.Squares[clickedRow * 8 + clickedCol] == Piece.None)
                     {
                         selectedRow = selectedCol = null;
                         isPieceSelected = false;

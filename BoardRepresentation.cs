@@ -68,5 +68,20 @@ namespace Chess
         {
             return (fileIndex + rankIndex) % 2 == 0;
         }
+
+        public static string SquareNameFromIndex(int squareIndex)
+        {
+            return SquareNameFromCoordinate(CoordFromIndex(squareIndex));
+        }
+
+        public static string SquareNameFromCoordinate(Coord coord)
+        {
+            return SquareNameFromCoordinate(coord.fileIndex, coord.rankIndex);
+        }
+
+        public static string SquareNameFromCoordinate(int fileIndex, int rankIndex)
+        {
+            return fileNames[fileIndex] + "" + rankNames[rankIndex];
+        }
     }
 }
