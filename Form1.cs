@@ -109,14 +109,20 @@ namespace Chess
         {
             if (e.Button != MouseButtons.Left) return;
 
+            OnSquareClicked(e.X, e.Y);
+        }
 
-            var pos = GetBoardPosition(e.X, e.Y);
+        private void OnSquareClicked(int X, int Y)
+        {
+            var pos = GetBoardPosition(X, Y);
 
+            // If the click is inside the board
             if (pos != null)
             {
+                // Where the current click is
                 var (clickedRow, clickedCol) = pos.Value;
 
-                // If no piece is selected, 
+                // If no piece is selected right now 
                 if (!isPieceSelected)
                 {
                     // Select a piece if the square has a piece on it and highlight it
@@ -129,6 +135,7 @@ namespace Chess
                         this.Invalidate(); // Repaint the form to make sure the square is blue
                     }
                 }
+                // If a piece is already selected; add movement logic
                 else if (isPieceSelected)
                 {
                     // If the already selected square is clicked on again, remove selection
@@ -138,19 +145,42 @@ namespace Chess
                         isPieceSelected = false;
                         this.Invalidate();
                     }
-                    // If another square is click and another piece is present, unselect
-                    else if (Board.Squares[clickedRow * 8 + clickedCol] != Piece.None)
+                    // If another square is clicked and another piece is present, unselect
+                    else if (Board.Squares[clickedRow * 8 + clickedCol] != Piece.None && selectedRow != null && selectedCol != null)
                     {
-                        selectedRow = clickedRow;
-                        selectedCol = clickedCol;
-                        isPieceSelected = true;
-                        this.Invalidate();
-                    }
-                    // If the clicked on square is empty, unselect the selected square
-                    else if (Board.Squares[clickedRow * 8 + clickedCol] == Piece.None)
-                    {
+                        int fromIndex = selectedRow.Value * 8 + selectedCol.Value;
+                        int toIndex = clickedRow * 8 + clickedCol;
+
+                        // A basic move that has no flag for now
+                        Move move = new Move((ushort)fromIndex, (ushort)toIndex);
+
+                        // Actually make the move
+                        Board.MakeMove(move);
+
+                        // Clear the selection
                         selectedRow = selectedCol = null;
                         isPieceSelected = false;
+
+                        // Refresh the gui
+                        this.Invalidate();
+                    }
+                    // If the clicked on square is empty, unselect the selected square and move
+                    else if (Board.Squares[clickedRow * 8 + clickedCol] == Piece.None && selectedRow != null && selectedCol != null)
+                    {
+                        int fromIndex = selectedRow.Value * 8 + selectedCol.Value;
+                        int toIndex = clickedRow * 8 + clickedCol;
+
+                        // A basic move that has no flag for now
+                        Move move = new Move((ushort)fromIndex, (ushort)toIndex);
+
+                        // Actually make the move
+                        Board.MakeMove(move);
+
+                        // Clear the selection
+                        selectedRow = selectedCol = null;
+                        isPieceSelected = false;
+
+                        // Refresh the gui
                         this.Invalidate();
                     }
                 }
@@ -177,8 +207,6 @@ namespace Chess
             return null;
         }
 
-        // Fix image displaying
-        // Uncomment when ready
         private void LoadPieceImages()
         {
             pieceImages["P"] = Image.FromFile($"Resources/Pieces/white_pawn.png");

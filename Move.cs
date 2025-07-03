@@ -12,13 +12,16 @@ namespace Chess
         public readonly struct Flag
         {
             public const int None = 0; // If its just a normal move
-            public const int EnPassantCapture = 1; // If en passant happened
-            public const int Castling = 2; // Can check with type of castling using boards
-            public const int PromoteToQueen = 3;
-            public const int PromoteToRook = 4;
-            public const int PromoteToKnight = 5;
-            public const int PromoteToBishop = 6;
-            public const int PawnTwoForward = 7; // If a pawn is moving 2 squares
+            public const int PawnTwoForward = 1; // If a pawn is moving 2 squares
+            public const int EnPassantCapture = 2; // If en passant happened
+            public const int WhiteKingsideCastling = 3;
+            public const int WhiteQueensideCastling = 4;
+            public const int BlackKingsideCastling = 5;
+            public const int BlackQueensideCastling = 6;
+            public const int PromoteToQueen = 7;
+            public const int PromoteToRook = 8;
+            public const int PromoteToKnight = 9;
+            public const int PromoteToBishop = 10;
         }
 
         readonly ushort moveValue; // The 16 bits that mean show the move

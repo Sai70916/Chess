@@ -1,6 +1,7 @@
 namespace Chess
 {
-    using System.Collections.Generic;
+    using System.Diagnostics;
+
     public static class Board
     {
         // Array of the board, used for easy lookup and easier to use when rendering the board
@@ -28,6 +29,11 @@ namespace Chess
         public static ulong WhitePieces => WhitePawns | WhiteRooks | WhiteKnights | WhiteBishops | WhiteQueens | WhiteKing;
         public static ulong BlackPieces => BlackPawns | BlackRooks | BlackKnights | BlackBishops | BlackQueens | BlackKing;
         public static ulong AllPieces => WhitePieces | BlackPieces;
+        // The comma inbetween the brackets shows its a multi dimensional array, and each 
+        // row thats 0 or 1 contains white or black boards, and each color has 6 boards
+        public static ulong[,] BitBoards = new ulong[2, 8];
+        // This is an empty bitboard. Used in Initialize() and MakeMove()
+        private static ulong EmptyBitBoard;
 
 
         public static void LoadStartPosition()
@@ -88,13 +94,67 @@ namespace Chess
             }
         }
 
-
         static void Initialize()
         {
             // Clear the board representation
             Array.Fill(Squares, Piece.None);
             WhitePawns = WhiteRooks = WhiteKnights = WhiteBishops = WhiteQueens = WhiteKing = 0;
             BlackPawns = BlackRooks = BlackKnights = BlackBishops = BlackQueens = BlackKing = 0;
+            EmptyBitBoard = 0b000000;
+
+            // Put all the bitboards in a list of bitboards
+            BitBoards = new ulong[2, 8];
+            BitBoards[0, 0] = EmptyBitBoard;
+            BitBoards[0, 1] = WhiteKing;
+            BitBoards[0, 2] = WhitePawns;
+            BitBoards[0, 3] = WhiteKnights;
+            BitBoards[0, 4] = EmptyBitBoard;
+            BitBoards[0, 5] = WhiteBishops;
+            BitBoards[0, 6] = WhiteRooks;
+            BitBoards[0, 7] = WhiteQueens;
+            BitBoards[1, 1] = BlackKing;
+            BitBoards[1, 2] = BlackPawns;
+            BitBoards[1, 3] = BlackKnights;
+            BitBoards[1, 4] = EmptyBitBoard;
+            BitBoards[1, 5] = BlackBishops;
+            BitBoards[1, 6] = BlackRooks;
+            BitBoards[1, 7] = BlackQueens;
+        }
+
+        public static void MakeMove(Move move)
+        {
+            int fromSquare = move.StartSquare;
+            int toSquare = move.TargetSquare;
+            int movingPiece = Squares[fromSquare];
+            int capturedPiece = Squares[toSquare];
+
+            // Update the array
+            Squares[fromSquare] = Piece.None;
+            Squares[toSquare] = movingPiece;
+
+            // Update the bitboards
+            ulong toMask = 1UL << toSquare; // We want to remove this bit
+            ulong fromMask = 1UL << fromSquare; // We want to add/replace this bit
+
+            int pieceType = Piece.GetPieceType(movingPiece);
+            bool isWhite = Piece.IsColor(movingPiece, Piece.White);
+            int colorIndex = isWhite ? 0 : 1;
+
+            // Remove the single start square bit from the right bitboard
+            BitBoards[colorIndex, pieceType] &= ~fromMask;
+            // Add/Replace the single end sqaure bit from the right bitboard
+            BitBoards[colorIndex, pieceType] |= toMask;
+
+            // Remove the captured piece from its bit board
+            if (capturedPiece != Piece.None)
+            {
+                int capturedType = Piece.GetPieceType(capturedPiece);
+                bool capturedIsWhite = Piece.IsColor(capturedPiece, Piece.White);
+                int capturedColorIndex = capturedIsWhite ? 0 : 1;
+                Debug.WriteLine($"Captured piece type: {capturedType}, captured color is white: {capturedIsWhite}, captured color index: {capturedColorIndex}");
+
+                BitBoards[capturedColorIndex, capturedType] &= ~toMask;
+            }
         }
     }
 }
