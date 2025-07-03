@@ -14,16 +14,17 @@ namespace Chess
         private int? selectedRow;
         private int? selectedCol;
         private int[]? selectedPieceCoords = new int[2];
+        private bool isPieceSelected = false;
 
         private Dictionary<string, Image> pieceImages = new();
+
+        public static Label testingLabel = new Label();
 
         public Form1()
         {
             InitializeComponent();
             this.DoubleBuffered = true; // Makes the flickering when redrawing the board go away
             Board.LoadStartPosition();
-            // Fix image displaying
-            // Uncomment when ready
             LoadPieceImages();
 
             this.BackColor = Color.FromArgb(50, 50, 50);
@@ -37,6 +38,15 @@ namespace Chess
 
             windowWidth = this.ClientSize.Width;
             windowHeight = this.ClientSize.Height;
+
+            // Debug
+            // Delete
+            testingLabel.Text = "Text";
+            testingLabel.Location = new Point(20, 20);
+            testingLabel.AutoSize = true;
+            testingLabel.ForeColor = Color.Black;
+            testingLabel.Font = new Font("Arial", 24, FontStyle.Bold);
+            this.Controls.Add(testingLabel);
         }
 
 
@@ -81,7 +91,7 @@ namespace Chess
                     }
                     // --DRAW PIECE--
                     int squareIndex = row * 8 + col;
-                    int piece = Board.Square[squareIndex];
+                    int piece = BitBoardUtility.GetPieceAtSquare(squareIndex).pieceType;
 
                     if (piece != Piece.None)
                     {
@@ -98,37 +108,53 @@ namespace Chess
         }
         private void Form1_MouseDown(object? sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
+            if (e.Button != MouseButtons.Left) return;
+
+
+            var pos = GetBoardPosition(e.X, e.Y);
+
+            if (pos != null)
             {
-                int x = e.X;
-                int y = e.Y;
+                var (clickedRow, clickedCol) = pos.Value;
 
-
-                var pos = GetBoardPosition(x, y);
-                if (pos != null)
+                // If no piece is selected, 
+                if (!isPieceSelected)
                 {
-                    var (newRow, newCol) = pos.Value;
-
-                    // Keep track of last highlighted square to make sure it turn normal 
-                    // after new square is selected
-                    if (selectedRow.HasValue && selectedCol.HasValue)
+                    // Select a piece if the square has a piece on it and highlight it
+                    if (BitBoardUtility.GetPieceAtSquare(clickedRow * 8 + clickedCol) is (true, int piecePresent, bool))
                     {
-                        this.Invalidate();
-                    }
-
-                    if (Board.SquareContainsPiece(newRow, newCol))
-                    {
-                        selectedRow = newRow;
-                        selectedCol = newCol;
+                        selectedRow = clickedRow;
+                        selectedCol = clickedCol;
+                        isPieceSelected = piecePresent != Piece.None;
 
                         this.Invalidate(); // Repaint the form to make sure the square is blue
                     }
-                    else
+                }
+
+                // If the highlighted square is the same place as the new click, 
+                // unhighlight the square
+                if (selectedRow != null && selectedCol != null)
+                {
+                    if (selectedRow.Value == clickedRow && selectedCol.Value == clickedCol)
                     {
-                        selectedCol = null;
                         selectedRow = null;
+                        selectedCol = null;
+                        this.Invalidate();
+                        return;
                     }
                 }
+                else
+                {
+                    selectedRow = null;
+                    selectedCol = null;
+                    this.Invalidate();
+                }
+            }
+            else if (pos == null && selectedRow.HasValue && selectedCol.HasValue)
+            {
+                selectedRow = null;
+                selectedCol = null;
+                this.Invalidate();
             }
         }
 
