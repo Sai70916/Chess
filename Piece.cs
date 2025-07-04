@@ -1,6 +1,6 @@
 namespace Chess
 {
-    public static class Piece
+    public class Piece
     {
         // This looks weird at first, but it is like this so that whenever looking at the
         //  binary values of the pieces, first 2 digits are either 01 for white or 10 for 
@@ -22,9 +22,9 @@ namespace Chess
         const int whiteMask = 0b01000;
         const int colorMask = whiteMask | blackMask; //0b11000
 
-        // Since these are static classes, we do not need to make a instance of this class 
+        // Since these are classes, we do not need to make a instance of this class 
         // to use them
-        public static bool IsColor(int piece, int color)
+        public bool IsColor(int piece, int color)
         {
             // Used to check if a certain piece is a certain color.
             // They and operator only passes 1 if both have a 1 in that spot, so if the 
@@ -33,17 +33,17 @@ namespace Chess
             return (piece & colorMask) == color;
         }
 
-        public static int GetColor(int piece)
+        public int GetColor(int piece)
         {
             return piece & colorMask;
         }
 
-        public static int GetPieceType(int piece)
+        public int GetPieceType(int piece)
         {
             return piece & typeMask;
         }
 
-        public static string GetPieceSymbol(int piece)
+        public string GetPieceSymbol(int piece)
         {
             int type = GetPieceType(piece);
             bool isWhite = IsColor(piece, White);

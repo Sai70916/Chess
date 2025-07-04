@@ -30,6 +30,8 @@ namespace Chess
         const ushort targetSquareMask = 0b0000111111000000;
         const ushort flagMask = 0b1111000000000000;
 
+        public readonly BoardRepresentation boardRepresentationInstance = new BoardRepresentation();
+
         // Used to create a new move structure
         public Move(ushort moveValue)
         {
@@ -108,7 +110,7 @@ namespace Chess
             }
         }
 
-        public static bool IsSameMove(Move a, Move b)
+        public bool IsSameMove(Move a, Move b)
         {
             return a.moveValue == b.moveValue;
         }
@@ -117,8 +119,8 @@ namespace Chess
         {
             get
             {
-                return BoardRepresentation.SquareNameFromIndex(StartSquare) + "-"
-                       + BoardRepresentation.SquareNameFromIndex(TargetSquare);
+                return boardRepresentationInstance.SquareNameFromIndex(StartSquare) + "-"
+                       + boardRepresentationInstance.SquareNameFromIndex(TargetSquare);
             }
         }
     }

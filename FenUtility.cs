@@ -1,9 +1,9 @@
 namespace Chess
 {
-    public static class FenUtility
+    public class FenUtility
     {
         // Dictionary for converting the letters in fen to piece names
-        static Dictionary<char, int> pieceTypeFromSymbol = new Dictionary<char, int>()
+        Dictionary<char, int> pieceTypeFromSymbol = new Dictionary<char, int>()
         {
             ['k'] = Piece.King,
             ['p'] = Piece.Pawn,
@@ -16,8 +16,10 @@ namespace Chess
         // Board-Position To-Move(lowercase) Castling-Rights En-Passant-Target-Square Half-Move-Count Full-Move-Count
         public const string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -- 0 1";
 
+        public BoardRepresentation boardRepresentationInstance = new BoardRepresentation();
+
         // Load the postion from a fen, the return value is a new board
-        public static LoadedPositionInfo PositionFromFen(string fen)
+        public LoadedPositionInfo PositionFromFen(string fen)
         {
             LoadedPositionInfo loadedPositionInfo = new LoadedPositionInfo();
             string[] sections = fen.Split(" "); // Seperate the fen into a list
@@ -64,9 +66,9 @@ namespace Chess
             if (sections.Length > 3 && sections[3] != "--")
             {
                 char enPassantFileName = sections[3][0]; // We dont need row
-                if (BoardRepresentation.fileNames.Contains(enPassantFileName))
+                if (boardRepresentationInstance.fileNames.Contains(enPassantFileName))
                 {
-                    loadedPositionInfo.epFile = BoardRepresentation.fileNames.IndexOf(enPassantFileName);
+                    loadedPositionInfo.epFile = boardRepresentationInstance.fileNames.IndexOf(enPassantFileName);
                 }
 
             }

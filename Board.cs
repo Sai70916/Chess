@@ -2,50 +2,55 @@ namespace Chess
 {
     using System.Diagnostics;
 
-    public static class Board
+    public class Board
     {
         // Array of the board, used for easy lookup and easier to use when rendering the board
-        public static int[] Squares = new int[64];
+        public int[] Squares = new int[64];
 
         // --BIT BOARDS--
         // Representation of the board in binary, a bit is flipped on if piece is present 
         // with each bit representing a square
         // Use them for move gen, legal moves gen and for bitwise operations
         // White bitboards
-        public static ulong WhitePawns;
-        public static ulong WhiteRooks;
-        public static ulong WhiteKnights;
-        public static ulong WhiteBishops;
-        public static ulong WhiteQueens;
-        public static ulong WhiteKing;
+        public ulong WhitePawns;
+        public ulong WhiteRooks;
+        public ulong WhiteKnights;
+        public ulong WhiteBishops;
+        public ulong WhiteQueens;
+        public ulong WhiteKing;
         // Black bitboards
-        public static ulong BlackPawns;
-        public static ulong BlackRooks;
-        public static ulong BlackKnights;
-        public static ulong BlackBishops;
-        public static ulong BlackQueens;
-        public static ulong BlackKing;
+        public ulong BlackPawns;
+        public ulong BlackRooks;
+        public ulong BlackKnights;
+        public ulong BlackBishops;
+        public ulong BlackQueens;
+        public ulong BlackKing;
         // Grouped piece bitsboard
-        public static ulong WhitePieces => WhitePawns | WhiteRooks | WhiteKnights | WhiteBishops | WhiteQueens | WhiteKing;
-        public static ulong BlackPieces => BlackPawns | BlackRooks | BlackKnights | BlackBishops | BlackQueens | BlackKing;
-        public static ulong AllPieces => WhitePieces | BlackPieces;
+        public ulong WhitePieces => WhitePawns | WhiteRooks | WhiteKnights | WhiteBishops | WhiteQueens | WhiteKing;
+        public ulong BlackPieces => BlackPawns | BlackRooks | BlackKnights | BlackBishops | BlackQueens | BlackKing;
+        public ulong AllPieces => WhitePieces | BlackPieces;
         // The comma inbetween the brackets shows its a multi dimensional array, and each 
         // row thats 0 or 1 contains white or black boards, and each color has 6 boards
-        public static ulong[,] BitBoards = new ulong[2, 8];
+        public ulong[,] BitBoards = new ulong[2, 8];
         // This is an empty bitboard. Used in Initialize() and MakeMove()
-        private static ulong EmptyBitBoard;
+        private ulong EmptyBitBoard;
 
+        // Turn related variables
+        public bool whiteToMove;
 
-        public static void LoadStartPosition()
+        public FenUtility fenUtilityInstance = new FenUtility();
+        public Piece pieceInstance = new Piece();
+
+        public void LoadStartPosition()
         {
             LoadPosition(FenUtility.startingFen);
         }
 
-        public static void LoadPosition(string fen)
+        public void LoadPosition(string fen)
         {
             Initialize();
             // Get the position info
-            var loadedPositon = FenUtility.PositionFromFen(fen);
+            var loadedPositon = fenUtilityInstance.PositionFromFen(fen);
 
             // Load the pieces in a array
             // Use 63 and check if equal to zero since it is 0-indexed
@@ -64,8 +69,8 @@ namespace Chess
                 // the end of the ulong, so 000...1000. This with the && operator 
                 // can assign a single bit to a bit board 
                 ulong mask = 1UL << squareIndex;
-                bool isWhite = Piece.IsColor(piece, Piece.White);
-                int type = Piece.GetPieceType(piece);
+                bool isWhite = pieceInstance.IsColor(piece, Piece.White);
+                int type = pieceInstance.GetPieceType(piece);
 
                 if (isWhite)
                 {
@@ -94,7 +99,7 @@ namespace Chess
             }
         }
 
-        static void Initialize()
+        void Initialize()
         {
             // Clear the board representation
             Array.Fill(Squares, Piece.None);
@@ -121,7 +126,7 @@ namespace Chess
             BitBoards[1, 7] = BlackQueens;
         }
 
-        public static void MakeMove(Move move)
+        public void MakeMove(Move move)
         {
             int fromSquare = move.StartSquare;
             int toSquare = move.TargetSquare;
@@ -136,8 +141,8 @@ namespace Chess
             ulong toMask = 1UL << toSquare; // We want to remove this bit
             ulong fromMask = 1UL << fromSquare; // We want to add/replace this bit
 
-            int pieceType = Piece.GetPieceType(movingPiece);
-            bool isWhite = Piece.IsColor(movingPiece, Piece.White);
+            int pieceType = pieceInstance.GetPieceType(movingPiece);
+            bool isWhite = pieceInstance.IsColor(movingPiece, Piece.White);
             int colorIndex = isWhite ? 0 : 1;
 
             // Remove the single start square bit from the right bitboard
@@ -148,8 +153,8 @@ namespace Chess
             // Remove the captured piece from its bit board
             if (capturedPiece != Piece.None)
             {
-                int capturedType = Piece.GetPieceType(capturedPiece);
-                bool capturedIsWhite = Piece.IsColor(capturedPiece, Piece.White);
+                int capturedType = pieceInstance.GetPieceType(capturedPiece);
+                bool capturedIsWhite = pieceInstance.IsColor(capturedPiece, Piece.White);
                 int capturedColorIndex = capturedIsWhite ? 0 : 1;
                 Debug.WriteLine($"Captured piece type: {capturedType}, captured color is white: {capturedIsWhite}, captured color index: {capturedColorIndex}");
 

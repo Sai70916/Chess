@@ -5,6 +5,8 @@ namespace Chess
         public readonly int fileIndex;
         public readonly int rankIndex;
 
+        public BoardRepresentation boardRepresentationInstance = new BoardRepresentation();
+
         public Coord(int fileIndex, int rankIndex)
         {
             this.fileIndex = fileIndex;
@@ -13,8 +15,8 @@ namespace Chess
 
         public Coord(int squareIndex)
         {
-            fileIndex = BoardRepresentation.FileIndex(squareIndex);
-            rankIndex = BoardRepresentation.RankIndex(squareIndex);
+            fileIndex = boardRepresentationInstance.FileIndex(squareIndex);
+            rankIndex = boardRepresentationInstance.RankIndex(squareIndex);
         }
     }
 }
