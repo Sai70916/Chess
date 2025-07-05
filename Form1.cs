@@ -13,7 +13,8 @@ namespace Chess
 
         private int? selectedRow;
         private int? selectedCol;
-        private int[]? selectedPieceCoords = new int[2];
+        private int? selectedPiece;
+        private int? selectedPieceColor;
         private bool isPieceSelected = false;
 
         private Dictionary<string, Image> pieceImages = new();
@@ -128,17 +129,23 @@ namespace Chess
                 // If no piece is selected right now 
                 if (!isPieceSelected)
                 {
-                    // Select a piece if the square has a piece on it and highlight it
-                    if (boardInstance.Squares[clickedRow * 8 + clickedCol] != Piece.None)
+                    selectedPiece = boardInstance.Squares[clickedRow * 8 + clickedCol];
+                    // If the square has a piece on it
+                    if (selectedPiece != Piece.None)
                     {
-                        selectedRow = clickedRow;
-                        selectedCol = clickedCol;
-                        isPieceSelected = true;
+                        selectedPieceColor = pieceInstance.GetColor(selectedPiece.Value);
+                        // If it is the selected pieces turn, highlight
+                        if (selectedPieceColor == boardInstance.colorToMove)
+                        {
+                            selectedRow = clickedRow;
+                            selectedCol = clickedCol;
+                            isPieceSelected = true;
 
-                        this.Invalidate(); // Repaint the form to make sure the square is blue
+                            this.Invalidate(); // Repaint the form to make sure the square is blue
+                        }
                     }
                 }
-                // If a piece is already selected; add movement logic
+                // If a piece is already selected
                 else if (isPieceSelected)
                 {
                     // If the already selected square is clicked on again, remove selection
@@ -148,24 +155,36 @@ namespace Chess
                         isPieceSelected = false;
                         this.Invalidate();
                     }
-                    // If another square is clicked and another piece is present, unselect
+                    // If another square is clicked that has a piece
                     else if (boardInstance.Squares[clickedRow * 8 + clickedCol] != Piece.None && selectedRow != null && selectedCol != null)
                     {
                         int fromIndex = selectedRow.Value * 8 + selectedCol.Value;
                         int toIndex = clickedRow * 8 + clickedCol;
 
-                        // A basic move that has no flag for now
-                        Move move = new Move((ushort)fromIndex, (ushort)toIndex);
+                        // If the target piece is of a different color
+                        if (pieceInstance.GetColor(boardInstance.Squares[toIndex]) == boardInstance.opponentColor)
+                        {
+                            // A basic move that has no flag for now
+                            Move move = new Move((ushort)fromIndex, (ushort)toIndex);
 
-                        // Actually make the move
-                        boardInstance.MakeMove(move);
+                            // Actually make the move
+                            boardInstance.MakeMove(move);
+                            boardInstance.ToggleTurn();
 
-                        // Clear the selection
-                        selectedRow = selectedCol = null;
-                        isPieceSelected = false;
+                            // Clear the selection
+                            selectedRow = selectedCol = null;
+                            isPieceSelected = false;
 
-                        // Refresh the gui
-                        this.Invalidate();
+                            // Refresh the gui
+                            this.Invalidate();
+                        }
+                        else
+                        {
+                            selectedCol = selectedRow = null;
+                            selectedPiece = null;
+                            isPieceSelected = false;
+                            this.Invalidate();
+                        }
                     }
                     // If the clicked on square is empty, unselect the selected square and move
                     else if (boardInstance.Squares[clickedRow * 8 + clickedCol] == Piece.None && selectedRow != null && selectedCol != null)
@@ -178,6 +197,7 @@ namespace Chess
 
                         // Actually make the move
                         boardInstance.MakeMove(move);
+                        boardInstance.ToggleTurn();
 
                         // Clear the selection
                         selectedRow = selectedCol = null;

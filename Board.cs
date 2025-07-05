@@ -37,6 +37,10 @@ namespace Chess
 
         // Turn related variables
         public bool whiteToMove;
+        public int colorToMove; // The int from Piece.cs
+        public int opponentColor;
+        public int playerColor;
+
 
         public FenUtility fenUtilityInstance = new FenUtility();
         public Piece pieceInstance = new Piece();
@@ -124,6 +128,12 @@ namespace Chess
             BitBoards[1, 5] = BlackBishops;
             BitBoards[1, 6] = BlackRooks;
             BitBoards[1, 7] = BlackQueens;
+
+            // Initialize the turn/player fields
+            whiteToMove = true;
+            colorToMove = Piece.White;
+            playerColor = Piece.White;
+            opponentColor = Piece.Black;
         }
 
         public void MakeMove(Move move)
@@ -160,6 +170,19 @@ namespace Chess
 
                 BitBoards[capturedColorIndex, capturedType] &= ~toMask;
             }
+        }
+
+        public void ToggleTurn()
+        {
+            // Make sure you remember which is using info about the last turn and 
+            // which is using info about the current turn
+
+            // If it was just whites to move, then now its not
+            whiteToMove = whiteToMove ? false : true;
+            // If its now white to move, the the color to move is white
+            colorToMove = whiteToMove ? Piece.White : Piece.Black;
+            // If its now white to move, then the opponent is black
+            opponentColor = (colorToMove == Piece.White) ? Piece.Black : Piece.White;
         }
     }
 }
